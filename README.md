@@ -73,7 +73,7 @@ pip install -r requirements.txt
 |   |-- test_bellman_ford.py  
 |   |-- test_floyd_warshall.py  
 |  
-|-- /examples  
+|-- /graphs  
     |-- grafo_nao_direcionado.dot
     |-- grafo_direcionado.dot
 ```
