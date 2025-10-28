@@ -1,0 +1,6 @@
+graph g1 {
+  a -- b [weight=5];
+  b -- c [weight=7];
+  b -- d [weight=11];
+  b -- e [weight=15]; 
+}
