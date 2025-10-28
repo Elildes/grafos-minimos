@@ -44,18 +44,20 @@ pip install -r requirements.txt
 ./devserver.sh
 ```
 
+Depois clicar no link que aparecerá no terminal ou digitar no navehagor [http://127.0.0.1:8080](http://127.0.0.1:8080).  
+
 ## Estrutura do projeto
 
 
 ```
-| 
-|-- main.py             # Ponto de entrada do programa  
-|-- README.md           # Descrição do projeto e instruções de uso  
-|-- devserver.sh        # Script para executar a aplicação
-|-- requirements.txt    # Lista de dependências do projeto  
+|
+|-- /digraphs           # Armazena os grafos direcionados
+|   |-- digraph01.dot
 |  
-|-- /src 
-|   |-- index.html 
+|-- /graphs             # Armazena os grafos não direcionados
+|    |-- graph01.dot
+|  
+|-- /src
 |   |-- init.py  
 |   |-- graph.py        # Módulo para representação do grafo  
 |   |-- dot_parser.py   # Módulo para ler e interpretar arquivos DOT  
@@ -67,15 +69,12 @@ pip install -r requirements.txt
 |   |-- floyd_warshall.py   # Implementação do Algoritmo de Floyd-Warshall  
 |   |-- heap.py             # Implementação da estrutura de heap binário  
 |
-|-- /tests  
-|   |-- test_graph.py  
-|   |-- test_prim.py  
-|   |-- test_bellman_ford.py  
-|   |-- test_floyd_warshall.py  
+|-- /templates  
+|   |-- index.html                # Pagina inicial
+|   |-- templates/results.html    # Mostra resultados do servidor
 |
-|-- /digraphs           # Armazena os grafos direcionados
-|   |-- graph01.dot
-|  
-|-- /graphs             # Armazena os grafos não direcionados
-    |-- graph01.dot
+|-- app.py              # Servidor API da aplicação
+|-- devserver.sh        # Script para executar a aplicação
+|-- README.md           # Descrição do projeto e instruções de uso  
+|-- requirements.txt    # Lista de dependências do projeto  
 ```

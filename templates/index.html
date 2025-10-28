@@ -48,7 +48,8 @@
             <div id="graph-type-selection" class="mb-3" style="display: none;">
                 <label class="form-label"><strong>2. Escolha o Tipo de Grafo:</strong></label>
                 <div>
-                   <input type="radio" class="form-check-input" id="graph_type_directed" name="graph_type" value="directed">                       <label class="form-check-label" for="graph_type_directed">Grafos Direcionados (Digraphs)</label>
+                   <input type="radio" class="form-check-input" id="graph_type_directed" name="graph_type" value="directed">
+                   <label class="form-check-label" for="graph_type_directed">Grafos Direcionados (Digraphs)</label>
                 </div>
                 <div>
                     <input type="radio" class="form-check-input" id="graph_type_undirected" name="graph_type" value="undirected">
@@ -73,7 +74,7 @@
         // --- Início do JavaScript ---
 
         // Variável será preenchida pela API
-        const availableGraphs = {
+        let availableGraphs = {
             graphs: [],         // Arquivos em /graphs
             digraphs: []        // Arquivos em /digraphs
         };
@@ -83,6 +84,10 @@
             fetch('/api/get-graphs')
                 .then(response => response.json())
                 .then(data => {
+                    // --- NOSSO DEBUG ---
+                    console.log("DADOS EXATOS RECEBIDOS DA API:", JSON.stringify(data));
+                    // --- FIM DO DEBUG ---
+
                     availableGraphs = data;
                     console.log("Grafos carregados:", availableGraphs);
                     

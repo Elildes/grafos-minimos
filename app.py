@@ -19,18 +19,39 @@ def get_available_graphs():
     graphs = []
     digraphs = []
     
+    # --- NOSSO DEBUG ---
+    print("--- INICIANDO get_available_graphs ---")
+    print(f"BASE_DIR absoluto: {BASE_DIR}")
+    print(f"Buscando em GRAPH_DIR: {GRAPH_DIR}")
+    # --- FIM DO DEBUG ---
+
     # Tenta ler a pasta de grafos não direcionados
     try:
         graphs = [f for f in os.listdir(GRAPH_DIR) if f.endswith('.dot') or f.endswith('.gv')]
+        # --- NOSSO DEBUG ---
+        print(f"Arquivos encontrados em graphs: {graphs}")
+        # --- FIM DO DEBUG ---
     except FileNotFoundError:
         print(f"Aviso: Diretório '{GRAPH_DIR}' não encontrado.")
+    except Exception as e:
+        print(f"Erro ao ler GRAPH_DIR: {e}") # Adicionado para pegar outros erros
+
+    # --- NOSSO DEBUG ---
+    print(f"Buscando em DIGRAPH_DIR: {DIGRAPH_DIR}")
+    # --- FIM DO DEBUG ---
 
     # Tenta ler a pasta de grafos direcionados
     try:
         digraphs = [f for f in os.listdir(DIGRAPH_DIR) if f.endswith('.dot') or f.endswith('.gv')]
+        # --- NOSSO DEBUG ---
+        print(f"Arquivos encontrados em digraphs: {digraphs}")
+        # --- FIM DO DEBUG ---
     except FileNotFoundError:
         print(f"Aviso: Diretório '{DIGRAPH_DIR}' não encontrado.")
+    except Exception as e:
+        print(f"Erro ao ler DIGRAPH_DIR: {e}") # Adicionado para pegar outros erros
 
+    print("--- FIM get_available_graphs ---")
     return {"graphs": graphs, "digraphs": digraphs}
 
 # --- Rota 1: Servir a Página Principal ---
