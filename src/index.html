@@ -1,12 +1,198 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World</title>
-  </head>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Seleção de Algoritmo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        #bar{
+            background-color: lightblue;
+            color: black;
+            padding: 10px;
+            text-align: center;
+            min-height: 50px;
+        }
+        #option{
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="bar">
+        <h2>Trabalho de Grafos - DIM0549</h2>
+    </div>
+    <div id="option" class="container mt-4">
+        <h1>Selecione um Algoritmo</h1>
+        <p>Escolha um dos algoritmos abaixo para executar:</p>
+        
+        <form action="/run-algorithm" method="post">
+            <div class="mb-3">
+                <label class="form-label"><strong>1. Escolha o Algoritmo</strong></label>
+                <div>
+                    <input type="radio" class="form-check-input" id="prim" name="algorithm" value="prim">
+                    <label class="form-check-label" for="prim">Algoritmo de Prim</label>
+                </div>                
+                <div>
+                    <input type="radio" class="form-check-input" id="bellman_ford" name="algorithm" value="bellman_ford">
+                    <label class="form-check-label" for="bellman_ford">Algoritmo de Bellman-Ford</label>
+                </div>                
+                <div>
+                    <input type="radio" class="form-check-input" id="floyd_warshall" name="algorithm" value="floyd_warshall">
+                    <label class="form-check-label" for="floyd_warshall">Algoritmo de Floyd-Warshall</label>
+                </div>
+            </div>
 
-  <body>
-    <h1>Hello World</h1>
-  </body>
+            <div id="graph-type-selection" class="mb-3" style="display: none;">
+                <label class="form-label"><strong>2. Escolha o Tipo de Grafo:</strong></label>
+                <div>
+                   <input type="radio" class="form-check-input" id="graph_type_directed" name="graph_type" value="directed">                       <label class="form-check-label" for="graph_type_directed">Grafos Direcionados (Digraphs)</label>
+                </div>
+                <div>
+                    <input type="radio" class="form-check-input" id="graph_type_undirected" name="graph_type" value="undirected">
+                    <label class="form-check-label" for="graph_type_undirected">Grafos Não Direcionados (Graphs)</label>
+                </div>                
+            </div>
+
+            <div id="graph-file-selection" class="mb-3" style="display: none;">
+                <label for="graph-file-list" class="form-label"><strong>3. Escolha o Grafo:</strong></label>
+                <div id="graph-file-container">
+                    </div>
+            </div>
+
+            <hr>                
+            <button type="submit" id="submit-button" class="btn btn-primary" disabled>Executar Algoritmo</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    <script>
+        // --- Início do JavaScript ---
+
+        // (SIMULAÇÃO) Lista de arquivos das suas pastas.
+        // Como o JS do navegador não pode ler diretórios, simulamos os arquivos aqui.
+        // Altere essas listas para refletir os arquivos reais em suas pastas.
+        const availableGraphs = {
+            graphs: ["grafo_nao_direcionado.dot", "mst_exemplo.dot"], // Arquivos em /graphs
+            digraphs: ["grafo_direcionado.dot"]                      // Arquivos em /digraphs
+            
+            // Para testar a mensagem de "Nenhum grafo", use:
+            // graphs: [],
+            // digraphs: []
+        };
+
+        // Referências aos elementos do DOM
+        const algorithmRadios = document.querySelectorAll('input[name="algorithm"]');
+        const graphTypeRadios = document.querySelectorAll('input[name="graph_type"]');
+
+        const typeSelectionDiv = document.getElementById('graph-type-selection');
+        const fileSelectionDiv = document.getElementById('graph-file-selection');
+        const fileContainer = document.getElementById('graph-file-container');
+        const submitButton = document.getElementById('submit-button');
+
+        // Adiciona "ouvintes" de eventos para a mudança nos botões de rádio
+        algorithmRadios.forEach(radio => radio.addEventListener('change', handleAlgorithmChange));
+        graphTypeRadios.forEach(radio => radio.addEventListener('change', handleGraphTypeChange));
+
+        
+        function handleAlgorithmChange(event) {
+            const selectedAlgorithm = event.target.value;
+            
+            // Reseta as etapas seguintes
+            resetStep(2);
+            resetStep(3);
+
+            // Lógica de UX: O Algoritmo de Prim só funciona em grafos não direcionados.
+            // Podemos pular a Etapa 2 para ele.
+            if (selectedAlgorithm === 'prim') {
+                // Pula direto para a Etapa 3, forçando "Não Direcionado"
+                typeSelectionDiv.style.display = 'none';
+                
+                // Marca o radio "undirected" (mesmo oculto) para o formulário enviar o valor correto
+                document.getElementById('graph_type_undirected').checked = true;
+
+                // Popula os arquivos da pasta 'graphs'
+                populateGraphFiles('graphs');
+                fileSelectionDiv.style.display = 'block';
+
+            } else {
+                // Para Bellman-Ford ou Floyd-Warshall, mostramos a Etapa 2
+                typeSelectionDiv.style.display = 'block';
+            }
+        }
+
+        function handleGraphTypeChange(event) {
+            const selectedType = event.target.value; // 'directed' or 'undirected'
+            resetStep(3);
+
+            const folder = (selectedType === 'directed') ? 'digraphs' : 'graphs';
+            populateGraphFiles(folder);
+            fileSelectionDiv.style.display = 'block';
+        }
+
+        /**
+         * Popula a lista de seleção de arquivos (Etapa 3)
+         */
+        function populateGraphFiles(folder) {
+            const files = availableGraphs[folder];
+            fileContainer.innerHTML = ''; // Limpa a lista anterior
+            
+            if (files.length === 0) {
+                // Mostra a mensagem de erro se não houver arquivos
+                fileContainer.innerHTML = '<p class="text-danger">Nenhum grafo disponível! Favor criar o grafo</p>';
+                submitButton.disabled = true; // Desabilita o envio
+            } else {
+                // Cria um <select> (dropdown) com os arquivos
+                const selectList = document.createElement('select');
+                selectList.id = 'graph-file-list';
+                selectList.name = 'graph_file'; // Nome que será enviado no formulário
+                selectList.className = 'form-select';
+                
+                // Adiciona uma opção padrão
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.text = "Selecione um arquivo...";
+                defaultOption.selected = true;
+                defaultOption.disabled = true;
+                selectList.appendChild(defaultOption);
+
+                files.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file;
+                    option.text = file;
+                    selectList.appendChild(option);
+                });
+
+                // Habilita o botão de submit apenas quando um arquivo for selecionado
+                selectList.addEventListener('change', () => {
+                    submitButton.disabled = (selectList.value === "");
+                });
+
+                fileContainer.appendChild(selectList);
+            }
+        }
+
+        /**
+         * Reseta uma etapa do formulário
+         */
+        function resetStep(step) {
+            submitButton.disabled = true;
+
+            if (step === 2) {
+                typeSelectionDiv.style.display = 'none';
+                graphTypeRadios.forEach(radio => radio.checked = false);
+            }
+            if (step === 3) {
+                fileSelectionDiv.style.display = 'none';
+                fileContainer.innerHTML = '';
+            }
+        }
+
+        // --- Fim do JavaScript ---
+    </script>
+
+</body>
 </html>
