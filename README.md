@@ -72,8 +72,10 @@ pip install -r requirements.txt
 |   |-- test_prim.py  
 |   |-- test_bellman_ford.py  
 |   |-- test_floyd_warshall.py  
+|
+|-- /digraphs           # Armazena os grafos direcionados
+|   |-- graph01.dot
 |  
-|-- /graphs  
-    |-- grafo_nao_direcionado.dot
-    |-- grafo_direcionado.dot
+|-- /graphs             # Armazena os grafos não direcionados
+    |-- graph01.dot
 ```
