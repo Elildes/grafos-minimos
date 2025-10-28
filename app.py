@@ -3,19 +3,14 @@ import sys
 import json
 from flask import Flask, render_template, jsonify, request
 
-# Importe suas funções de algoritmo
-from algorithms.prim import prim_mst
-# from algorithms.bellman_ford import bellman_ford # Mantenha comentado se não implementado
-# from algorithms.floyd_warshall import floyd_warshall # Mantenha comentado se não implementado
-from dot_parser import parse_dot
-
 # --- Configuração de Path ---
-# Adiciona a pasta 'src' ao sys.path para permitir imports diretos
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SRC_DIR = os.path.join(BASE_DIR, 'src')
-if SRC_DIR not in sys.path:
-    sys.path.insert(0, SRC_DIR)
-# ---------------------------
+
+# Importe suas funções de algoritmo
+from src.algorithms.prim import prim_mst
+# from src.algorithms.bellman_ford import bellman_ford # Mantenha comentado se não implementado
+# from src.algorithms.floyd_warshall import floyd_warshall # Mantenha comentado se não implementado
+from src.dot_parser import parse_dot
 
 app = Flask(__name__)
 
