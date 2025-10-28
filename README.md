@@ -46,6 +46,8 @@ pip install -r requirements.txt
 
 Depois clicar no link que aparecerá no terminal ou digitar no navehagor [http://127.0.0.1:8080](http://127.0.0.1:8080).  
 
+**Obs.:** o comando `./devserver.sh` é usado somente em modo `desenvolvedor`, não use ele no modo de `produção`.  
+
 ## Estrutura do projeto
 
 
@@ -68,6 +70,10 @@ Depois clicar no link que aparecerá no terminal ou digitar no navehagor [http:/
 |       |-- bellman_ford.py     # Implementação do Algoritmo de Bellman-Ford  
 |       |-- floyd_warshall.py   # Implementação do Algoritmo de Floyd-Warshall  
 |       |-- heap.py             # Implementação da estrutura de heap binário  
+|
+|-- /static             # Pasta padrão do Flask para arquivos estáticos
+|   |-- /css
+|       |-- styles.css  # Estilos css
 |
 |-- /templates  
 |   |-- index.html                # Pagina inicial
