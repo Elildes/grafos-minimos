@@ -5,4 +5,4 @@ source .venv/bin/activate
 export PORT=${PORT:-8080}
 
 echo "Iniciando servidor na porta $PORT..."
-python -u -m flask --app main run -p $PORT --debug
+python -u -m flask --app app run -p $PORT --debug

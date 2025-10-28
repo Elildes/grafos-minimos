@@ -48,7 +48,8 @@
             <div id="graph-type-selection" class="mb-3" style="display: none;">
                 <label class="form-label"><strong>2. Escolha o Tipo de Grafo:</strong></label>
                 <div>
-                   <input type="radio" class="form-check-input" id="graph_type_directed" name="graph_type" value="directed">                       <label class="form-check-label" for="graph_type_directed">Grafos Direcionados (Digraphs)</label>
+                   <input type="radio" class="form-check-input" id="graph_type_directed" name="graph_type" value="directed">
+                   <label class="form-check-label" for="graph_type_directed">Grafos Direcionados (Digraphs)</label>
                 </div>
                 <div>
                     <input type="radio" class="form-check-input" id="graph_type_undirected" name="graph_type" value="undirected">
@@ -72,17 +73,35 @@
     <script>
         // --- Início do JavaScript ---
 
-        // (SIMULAÇÃO) Lista de arquivos das suas pastas.
-        // Como o JS do navegador não pode ler diretórios, simulamos os arquivos aqui.
-        // Altere essas listas para refletir os arquivos reais em suas pastas.
-        const availableGraphs = {
-            graphs: ["grafo_nao_direcionado.dot", "mst_exemplo.dot"], // Arquivos em /graphs
-            digraphs: ["grafo_direcionado.dot"]                      // Arquivos em /digraphs
-            
-            // Para testar a mensagem de "Nenhum grafo", use:
-            // graphs: [],
-            // digraphs: []
+        // Variável será preenchida pela API
+        let availableGraphs = {
+            graphs: [],         // Arquivos em /graphs
+            digraphs: []        // Arquivos em /digraphs
         };
+
+        // Buscar os dados do servidor Python
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/get-graphs')
+                .then(response => response.json())
+                .then(data => {
+                    // --- NOSSO DEBUG ---
+                    console.log("DADOS EXATOS RECEBIDOS DA API:", JSON.stringify(data));
+                    // --- FIM DO DEBUG ---
+
+                    availableGraphs = data;
+                    console.log("Grafos carregados:", availableGraphs);
+                    
+                    // Se o usuário já tiver selecionado um tipo, atualiza a lista
+                    const selectedTypeRadio = document.querySelector('input[name="graph_type"]:checked');
+                    if (selectedTypeRadio) {
+                        handleGraphTypeChange({ target: selectedTypeRadio });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar lista de grafos:', error);
+                    fileContainer.innerHTML = '<p class="text-danger">Erro ao carregar lista de grafos do servidor.</p>';
+                });
+        });
 
         // Referências aos elementos do DOM
         const algorithmRadios = document.querySelectorAll('input[name="algorithm"]');
