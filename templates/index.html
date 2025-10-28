@@ -63,6 +63,12 @@
                     </div>
             </div>
 
+            <div id="start-vertex-selection" class="mb-3" style="display: none;">
+                <label for="start-vertex-input" class="form-label"><strong>4. Vértice Inicial</strong></label>
+                <input type="text" class="form-control" id="start-vertex-input" name="start_vertex" placeholder="Ex: a">
+                <div class="form-text">Necessário para Prim e Bellman-Ford.</div>
+            </div>
+
             <hr>                
             <button type="submit" id="submit-button" class="btn btn-primary" disabled>Executar Algoritmo</button>
         </form>
@@ -85,11 +91,10 @@
                 .then(response => response.json())
                 .then(data => {
                     // --- NOSSO DEBUG ---
-                    console.log("DADOS EXATOS RECEBIDOS DA API:", JSON.stringify(data));
-                    // --- FIM DO DEBUG ---
-
+                    console.log("DADOS EXATOS RECEBIDOS DA API:", JSON.stringify(data));                    
                     availableGraphs = data;
                     console.log("Grafos carregados:", availableGraphs);
+                    // --- FIM DO DEBUG ---
                     
                     // Se o usuário já tiver selecionado um tipo, atualiza a lista
                     const selectedTypeRadio = document.querySelector('input[name="graph_type"]:checked');
@@ -110,6 +115,11 @@
         const typeSelectionDiv = document.getElementById('graph-type-selection');
         const fileSelectionDiv = document.getElementById('graph-file-selection');
         const fileContainer = document.getElementById('graph-file-container');
+
+        // Referência à div do Vértice Inicial
+        const startVertexDiv = document.getElementById('start-vertex-selection');
+        const startVertexInput = document.getElementById('start-vertex-input');
+
         const submitButton = document.getElementById('submit-button');
 
         // Adiciona "ouvintes" de eventos para a mudança nos botões de rádio
@@ -123,6 +133,7 @@
             // Reseta as etapas seguintes
             resetStep(2);
             resetStep(3);
+            resetStep(4);
 
             // Lógica de UX: O Algoritmo de Prim só funciona em grafos não direcionados.
             // Podemos pular a Etapa 2 para ele.
@@ -137,9 +148,15 @@
                 populateGraphFiles('graphs');
                 fileSelectionDiv.style.display = 'block';
 
-            } else {
-                // Para Bellman-Ford ou Floyd-Warshall, mostramos a Etapa 2
+                // MOSTRA a Etapa 4 (Vértice Inicial)
+                startVertexDiv.style.display = 'block';
+
+            } else if (selectedAlgorithm === 'floyd_warshall') {
+                // Mostra a Etapa 2
                 typeSelectionDiv.style.display = 'block';
+                
+                // OCULTA a Etapa 4 (Vértice Inicial)
+                startVertexDiv.style.display = 'none';
             }
         }
 
@@ -159,7 +176,7 @@
             const files = availableGraphs[folder];
             fileContainer.innerHTML = ''; // Limpa a lista anterior
             
-            if (files.length === 0) {
+            if (!files || files.length === 0) {
                 // Mostra a mensagem de erro se não houver arquivos
                 fileContainer.innerHTML = '<p class="text-danger">Nenhum grafo disponível! Favor criar o grafo</p>';
                 submitButton.disabled = true; // Desabilita o envio
@@ -186,6 +203,7 @@
                 });
 
                 // Habilita o botão de submit apenas quando um arquivo for selecionado
+                // A validação do vértice inicial será feita no servidor
                 selectList.addEventListener('change', () => {
                     submitButton.disabled = (selectList.value === "");
                 });
@@ -207,6 +225,10 @@
             if (step === 3) {
                 fileSelectionDiv.style.display = 'none';
                 fileContainer.innerHTML = '';
+            }
+            if (step === 4) { // Reseta a nova etapa
+                startVertexDiv.style.display = 'none';
+                startVertexInput.value = '';
             }
         }
 
