@@ -74,6 +74,9 @@ Depois clicar no link que aparecerá no terminal ou digitar no navehagor [http:/
 |-- /static             # Pasta padrão do Flask para arquivos estáticos
 |   |-- /css
 |       |-- styles.css  # Estilos css
+|   |-- /js
+|       |-- api.js             # Script de comunicação com o servidor (fazer o fetch dos grafos)
+|       |-- form-logic.js      # Script da interface UI e toda a lógica de manipulação do formulário
 |
 |-- /templates  
 |   |-- index.html                # Pagina inicial
