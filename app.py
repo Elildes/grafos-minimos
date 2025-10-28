@@ -82,7 +82,7 @@ def run_algorithm():
 
         # 2. Determinar o caminho do arquivo
         base_dir = DIGRAPH_DIR if graph_type == 'directed' else GRAPH_DIR
-        filepath = os.path.join(base_dir, filename)
+        filepath = os.path.join(base_dir, filename) # type: ignore
 
         if not os.path.exists(filepath):
             return f"Erro: Arquivo não encontrado: {filepath}", 404

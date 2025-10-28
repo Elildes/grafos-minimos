@@ -63,11 +63,11 @@ Depois clicar no link que aparecerá no terminal ou digitar no navehagor [http:/
 |   |-- dot_parser.py   # Módulo para ler e interpretar arquivos DOT  
 |   |  
 |   |-- /algorithms  
-|   |-- init.py  
-|   |-- prim.py             # Implementação do Algoritmo de Prim  
-|   |-- bellman_ford.py     # Implementação do Algoritmo de Bellman-Ford  
-|   |-- floyd_warshall.py   # Implementação do Algoritmo de Floyd-Warshall  
-|   |-- heap.py             # Implementação da estrutura de heap binário  
+|       |-- init.py  
+|       |-- prim.py             # Implementação do Algoritmo de Prim  
+|       |-- bellman_ford.py     # Implementação do Algoritmo de Bellman-Ford  
+|       |-- floyd_warshall.py   # Implementação do Algoritmo de Floyd-Warshall  
+|       |-- heap.py             # Implementação da estrutura de heap binário  
 |
 |-- /templates  
 |   |-- index.html                # Pagina inicial
