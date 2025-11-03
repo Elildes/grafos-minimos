@@ -97,12 +97,70 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            
-            {% else %}
-                <h2>Resultado Desconhecido</h2>
-                <p>O algoritmo foi executado, mas este template não sabe como exibir o resultado.</p>
-                <pre>{{ kwargs }}</pre>
-            {% endif %}
+
+            {% elif algorithm == 'Floyd-Warshall' %}
+                <h2>Algoritmo de Floyd-Warshall (Caminhos Mínimos entre Todos os Pares)</h2>
+                <p class="success"><strong>{{ message | default('Processamento concluído com sucesso!') }}</strong></p>
+
+                {% if results and results.vertices %}
+                    <h3>Matriz de Distâncias:</h3>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>De \ Para</th>
+                                {% for v in results.vertices %}
+                                    <th>{{ v }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in results.vertices %}
+                                <tr>
+                                    <th>{{ i }}</th>
+                                    {% for j in results.vertices %}
+                                        {% set d = results.distances[i][j] if results.distances and i in results.distances and j in results.distances[i] else None %}
+                                        <td>
+                                            {% if d == 'Infinito' or d is none %}
+                                                ∞
+                                            {% else %}
+                                                {{ ('%.2f' % (d|float)) }}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <h3 style="margin-top:20px;">Caminhos Mínimos (origem → destino)</h3>
+                    <table class="results-table">
+                        <thead>
+                            <tr><th>Origem</th><th>Destino</th><th>Caminho</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for i in results.vertices %}
+                                {% for j in results.vertices %}
+                                    <tr>
+                                        <td>{{ i }}</td>
+                                        <td>{{ j }}</td>
+                                        <td>
+                                            {% set p = results.paths[i][j] if results.paths and i in results.paths and j in results.paths[i] else None %}
+                                            {% if p %}
+                                                {{ p | join(' &rarr; ') | safe }}
+                                            {% else %}
+                                                <em>Inacessível</em>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+                
+                {% else %}
+                    <p>Nenhum resultado disponível para Floyd-Warshall.</p>
+                {% endif %}
 
         {% endif %}
 

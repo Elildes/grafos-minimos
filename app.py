@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # ----------------------------------------------------
 from src.algorithms.prim import prim_mst
 from src.algorithms.bellman_ford import bellman_ford 
-# from src.algorithms.floyd_warshall import floyd_warshall # Mantenha comentado se não implementado
+from src.algorithms.floyd_warshall import floyd_warshall
 from src.dot_parser import parse_dot
 
 app = Flask(__name__)
@@ -119,12 +119,17 @@ def run_algorithm():
             return render_template('results.html', **context)
         
         elif algo == 'floyd_warshall':
-            # (Implementação futura)
-            return render_template('results.html', 
-                                  success=False, 
-                                  algorithm='Floyd-Warshall', 
-                                  error='Algoritmo Floyd-Warshall ainda não implementado.')
-        
+
+            # Chama o algoritmo
+            context = floyd_warshall(graph)
+
+            print(context)
+
+            # Adiciona informações extras ao contexto
+            context['filename'] = filename
+            context['algorithm'] = 'Floyd-Warshall'
+
+            return render_template('results.html', **context)
         else:
              return render_template('results.html', success=False, error=f"Erro: Algoritmo '{algo}' desconhecido."), 400
         # -----------------------------------------------------------
