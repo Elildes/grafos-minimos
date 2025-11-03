@@ -20,7 +20,7 @@ const fileContainer = document.getElementById('graph-file-container');
 const startVertexDiv = document.getElementById('start-vertex-selection');
 const startVertexInput = document.getElementById('start-vertex-input');
 const submitButton = document.getElementById('submit-button');
-
+const algorithmForm = document.getElementById('algorithm-form');
 
 // --- Definições das Funções de Lógica ---
 
@@ -128,21 +128,85 @@ function resetStep(step) {
 }
 
 
+/**
+ * Intercepta o envio do formulário, envia os dados como JSON via fetch
+ * e exibe a página de resultados.
+ */
+async function handleFormSubmit(event) {
+    // 1. Impede o envio padrão do formulário
+    event.preventDefault(); 
+    
+    // Desabilita o botão para evitar cliques duplos
+    submitButton.disabled = true;
+    submitButton.textContent = 'Executando...';
+
+    // 2. Coleta os dados do formulário manualmente (Método mais robusto)
+    
+    // Pega os valores dos campos que sempre existem
+    const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
+    const startVertex = document.getElementById('start-vertex-input').value;
+    
+    // Pega os valores dos campos que podem estar ocultos ou dinâmicos
+    const graphFileSelect = document.getElementById('graph-file-list');
+    const graphTypeRadio = document.querySelector('input[name="graph_type"]:checked');
+
+    // 3. Converte os dados para um objeto JSON
+    const data = {
+        algorithm: algorithm,
+        start_vertex: startVertex,
+        // Usa o valor do <select> se ele existir, senão envia null
+        graph_file: graphFileSelect ? graphFileSelect.value : null,
+        // Usa o valor do radio button se ele estiver checado, senão envia null
+        // (Nota: para o Prim, nós o marcamos via JS, então ele será pego aqui)
+        graph_type: graphTypeRadio ? graphTypeRadio.value : null
+    };
+
+    // Adiciona um log de depuração para vermos o que está sendo enviado
+    console.log("Enviando JSON para o servidor:", JSON.stringify(data, null, 2));
+
+    try {
+        // 4. Envia os dados como JSON usando fetch
+        const response = await fetch(algorithmForm.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        // 5. Pega a resposta. O servidor enviará a página HTML de resultados
+        const resultHtml = await response.text();
+
+        // 6. Substitui o conteúdo da página atual pela página de resultados
+        document.body.innerHTML = resultHtml;
+        
+    } catch (error) {
+        console.error('Erro ao submeter o formulário:', error);
+        alert('Ocorreu um erro ao processar sua solicitação. Verifique o console.');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Executar Algoritmo';
+    }
+}
+
+
 // --- Ponto de Entrada (Main) ---
 
 /**
  * Função principal de inicialização.
  */
 async function main() {
-    // 1. Adiciona os "ouvintes" de eventos nos botões
+    // 1. Adiciona os "ouvintes" de eventos nos botões de rádio
     algorithmRadios.forEach(radio => radio.addEventListener('change', handleAlgorithmChange));
     graphTypeRadios.forEach(radio => radio.addEventListener('change', handleGraphTypeChange));
+    
+    // 2. ADICIONA O OUVINTE DE SUBMISSÃO DO FORMULÁRIO
+    algorithmForm.addEventListener('submit', handleFormSubmit);
 
-    // 2. Busca os dados da API e preenche a var global
+    // 3. Busca os dados da API e preenche a var global
     availableGraphs = await fetchAvailableGraphs();
     console.log("Grafos carregados:", availableGraphs);
     
-    // 3. (Opcional) Re-popula caso o usuário tenha voltado
+    // 4. (Opcional) Re-popula caso o usuário tenha voltado
     const selectedTypeRadio = document.querySelector('input[name="graph_type"]:checked');
     if (selectedTypeRadio) {
         handleGraphTypeChange({ target: selectedTypeRadio });

@@ -1,27 +1,113 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title }}</title> <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados do Algoritmo</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f9; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .success { color: green; }
+        .error { color: red; border: 1px solid red; padding: 10px; border-radius: 5px; background: #ffebeb; }
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .results-table th, .results-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .results-table th { background-color: #f2f2f2; }
+        .total-cost { font-size: 1.2em; font-weight: bold; margin-top: 15px; }
+        pre { background-color: #eee; padding: 10px; border-radius: 5px; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>{{ title }}</h1>
-        <hr>
-        
-        <div class="alert alert-success" role="alert">
-            Resultado da Execução:
-        </div>
-        
-        <pre>
-            <code>
-                {{ result_data }}
-            </code>
-        </pre>
+    <div class="container">
+        <h1>Resultado do Processamento</h1>
 
-        <br>
-        <a href="/" class="btn btn-primary">Voltar</a>
+        {% if not success %}
+            <h2>Operação Falhou</h2>
+            <div class="error">
+                <p><strong>Erro:</strong> {{ error | default('Ocorreu um erro desconhecido.') }}</p>
+                {% if negative_cycle %}
+                    <p>O algoritmo de Bellman-Ford detectou um ciclo de custo negativo.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            
+            {% if algorithm == 'Prim' %}
+                <h2>Algoritmo de Prim (Árvore Geradora Mínima)</h2>
+                <p class="success"><strong>{{ message | default('Sucesso!') }}</strong></p>
+                {% if status %}<p><strong>Status:</strong> {{ status }}</p>{% endif %}
+                
+                <h3>Arestas da MST:</h3>
+                {% if mst_edges %}
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>De</th>
+                                <th>Para</th>
+                                <th>Custo (Peso)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u, v, weight in mst_edges %}
+                                <tr>
+                                    <td>{{ u }}</td>
+                                    <td>{{ v }}</td>
+                                    <td>{{ "%.2f"|format(weight) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Nenhuma aresta na MST (talvez um grafo de um único nó).</p>
+                {% endif %}
+
+                <div class="total-cost">
+                    Custo Total da MST: {{ "%.2f"|format(total_cost) }}
+                </div>
+
+            {% elif algorithm == 'Bellman-Ford' %}
+                <h2>Algoritmo de Bellman-Ford (Caminhos Mínimos)</h2>
+                <p class="success"><strong>{{ message }}</strong></p>
+                <p><strong>Origem:</strong> <code>{{ start_vertex }}</code></p>
+                
+                <h3>Resultados:</h3>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Destino</th>
+                            <th>Custo Total</th>
+                            <th>Caminho Mínimo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vertex in results.distances.keys() | sort %}
+                            <tr>
+                                <td><strong>{{ vertex }}</strong></td>
+                                <td>{{ results.distances[vertex] }}</td>
+                                <td>
+                                    {% set path = results.paths[vertex] %}
+                                    {% if path %}
+                                        {{ path | join(' &rarr; ') | safe }}
+                                    {% else %}
+                                        <em>Inacessível</em>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            
+            {% else %}
+                <h2>Resultado Desconhecido</h2>
+                <p>O algoritmo foi executado, mas este template não sabe como exibir o resultado.</p>
+                <pre>{{ kwargs }}</pre>
+            {% endif %}
+
+        {% endif %}
+
+        <hr style="margin-top: 30px;">
+        <a href="/">Voltar para a seleção</a>
     </div>
 </body>
 </html>
