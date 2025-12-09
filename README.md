@@ -38,6 +38,12 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Executar a aplicação web (Windows)
+
+```bash
+.\devserver.bat
+```
+
 ## Executar a aplicação web (Linux)
 
 ```bash
