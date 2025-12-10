@@ -1,0 +1,17 @@
+graph g3 {
+  a -- c [weight=7];
+  b -- c [weight=2];
+  b -- e [weight=8];
+  b -- f [weight=7];
+  c -- d [weight=6];
+  c -- f [weight=1];
+  d -- g [weight=6];
+  e -- f [weight=2];
+  e -- h [weight=1];
+  f -- g [weight=5];
+  f -- h [weight=4];
+  f -- i [weight=1];
+  g -- j [weight=2];
+  h -- i [weight=6];
+  i -- j [weight=5];
+}

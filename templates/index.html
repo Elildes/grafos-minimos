@@ -3,82 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>DSATUR - Coloração de Grafos</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Seleção de Algoritmo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-
 <body>
     <div id="bar">
         <h2>Trabalho de Grafos - DIM0549</h2>
     </div>
-
-    <div class="container mt-4">
-
-        <h1>Algoritmo DSATUR</h1>
-        <p>Escolha um grafo para executar a coloração.</p>
-
-        <form id="algorithm-form" method="post" action="/run-algorithm">
-
-            <!-- Algoritmo Fixo -->
+    <div id="option" class="container mt-4">
+        <h1>Selecione um Algoritmo</h1>
+        <p>Escolha um dos algoritmos abaixo para executar:</p>
+        
+        <form id="algorithm-form" action="/run-algorithm" method="post">
             <div class="mb-3">
-                <label class="form-label"><strong>Algoritmo Selecionado:</strong></label>
-                <input type="text" class="form-control" value="DSATUR" disabled>
-                <input type="hidden" name="algorithm" value="dsatur">
+                <label class="form-label"><strong>1. Escolha o Algoritmo</strong></label>
+                <div>
+                    <input type="radio" class="form-check-input" id="prim" name="algorithm" value="prim">
+                    <label class="form-check-label" for="prim">Algoritmo de Prim</label>
+                </div>                
+                <div>
+                    <input type="radio" class="form-check-input" id="bellman_ford" name="algorithm" value="bellman_ford">
+                    <label class="form-check-label" for="bellman_ford">Algoritmo de Bellman-Ford</label>
+                </div>                
+                <div>
+                    <input type="radio" class="form-check-input" id="floyd_warshall" name="algorithm" value="floyd_warshall">
+                    <label class="form-check-label" for="floyd_warshall">Algoritmo de Floyd-Warshall</label>
+                </div>
             </div>
 
-            <!-- Arquivo do Grafo -->
-            <div class="mb-3">
-                <label for="graph-file" class="form-label"><strong>Escolha o Grafo:</strong></label>
-                <select id="graph-file" name="graph_file" class="form-select" required>
-                    <option value="">Carregando...</option>
-                </select>
+            <div id="graph-type-selection" class="mb-3" style="display: none;">
+                <label class="form-label"><strong>2. Escolha o Tipo de Grafo:</strong></label>
+                <div>
+                   <input type="radio" class="form-check-input" id="graph_type_directed" name="graph_type" value="directed">
+                   <label class="form-check-label" for="graph_type_directed">Grafos Direcionados (Digraphs)</label>
+                </div>
+                <div>
+                    <input type="radio" class="form-check-input" id="graph_type_undirected" name="graph_type" value="undirected">
+                    <label class="form-check-label" for="graph_type_undirected">Grafos Não Direcionados (Graphs)</label>
+                </div>                
             </div>
 
-            <hr>
+            <div id="graph-file-selection" class="mb-3" style="display: none;">
+                <label for="graph-file-list" class="form-label"><strong>3. Escolha o Grafo:</strong></label>
+                <div id="graph-file-container">
+                    </div>
+            </div>
 
-            <button type="submit" id="submit-button" class="btn btn-primary" disabled>
-                Executar DSATUR
-            </button>
+            <div id="start-vertex-selection" class="mb-3" style="display: none;">
+                <label for="start-vertex-input" class="form-label"><strong>4. Vértice Inicial</strong></label>
+                <input type="text" class="form-control" id="start-vertex-input" name="start_vertex" placeholder="Ex: a">
+                <div class="form-text">Necessário para Prim e Bellman-Ford.</div>
+            </div>
+
+            <hr>                
+            <button type="submit" id="submit-button" class="btn btn-primary" disabled>Executar Algoritmo</button>
         </form>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
-    <script>
-        // Carrega dinamicamente os grafos via API
-        async function loadGraphs() {
-            try {
-                const response = await fetch('/api/get-graphs');
-                const data = await response.json();
-
-                const graphSelect = document.getElementById('graph-file');
-                graphSelect.innerHTML = "";
-
-                if (data.graphs.length === 0) {
-                    graphSelect.innerHTML = "<option value=''>Nenhum grafo encontrado</option>";
-                    return;
-                }
-
-                graphSelect.innerHTML = "<option value=''>Selecione...</option>";
-                data.graphs.forEach(file => {
-                    const opt = document.createElement('option');
-                    opt.value = file;
-                    opt.textContent = file;
-                    graphSelect.appendChild(opt);
-                });
-
-                graphSelect.addEventListener('change', () => {
-                    document.getElementById('submit-button').disabled = (graphSelect.value === "");
-                });
-
-            } catch (e) {
-                console.error("Erro ao carregar grafos:", e);
-            }
-        }
-
-        loadGraphs();
-    </script>
+    <script src="{{ url_for('static', filename='js/form-logic.js') }}" type="module"></script>
 
 </body>
 </html>

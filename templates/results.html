@@ -3,142 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultado - DSATUR</title>
-
+    <title>Resultados do Algoritmo</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            background-color: #f4f4f9; 
-            margin: 20px; 
-        }
-        .container { 
-            max-width: 900px; 
-            margin: auto; 
-            background: #fff; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f9; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h1, h2 { color: #333; }
         .success { color: green; }
-        .error { 
-            color: red; 
-            border: 1px solid red; 
-            padding: 10px; 
-            border-radius: 5px; 
-            background: #ffebeb; 
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 15px; 
-        }
-        th, td { 
-            border: 1px solid #ccc; 
-            padding: 8px; 
-            text-align: left; 
-        }
-        th { background-color: #f2f2f2; }
-        pre { 
-            background: #eee; 
-            padding: 10px; 
-            border-radius: 5px; 
-            overflow-x: auto; 
-        }
-        a { 
-            color: #007bff; 
-            text-decoration: none; 
-        }
+        .error { color: red; border: 1px solid red; padding: 10px; border-radius: 5px; background: #ffebeb; }
+        .results-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .results-table th, .results-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .results-table th { background-color: #f2f2f2; }
+        .total-cost { font-size: 1.2em; font-weight: bold; margin-top: 15px; }
+        pre { background-color: #eee; padding: 10px; border-radius: 5px; }
+        a { color: #007bff; text-decoration: none; }
         a:hover { text-decoration: underline; }
     </style>
 </head>
-
 <body>
     <div class="container">
-
-        <h1>Resultado do Algoritmo DSATUR</h1>
+        <h1>Resultado do Processamento</h1>
 
         {% if not success %}
+            <h2>Operação Falhou</h2>
             <div class="error">
                 <p><strong>Erro:</strong> {{ error | default('Ocorreu um erro desconhecido.') }}</p>
+                {% if negative_cycle %}
+                    <p>O algoritmo de Bellman-Ford detectou um ciclo de custo negativo.</p>
+                {% endif %}
             </div>
-
         {% else %}
-
-            <p class="success"><strong>{{ message }}</strong></p>
-            <p><strong>Arquivo:</strong> {{ filename }}</p>
-
-            <h2>Resumo</h2>
-            <p><strong>Número total de cores usadas:</strong> {{ results.color_count }}</p>
-
-            <hr>
-
-            <h2>Coloração dos Vértices</h2>
-            {% if results.colors %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Vértice</th>
-                            <th>Cor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for v, c in results.colors.items() | sort %}
+            
+            {% if algorithm == 'Prim' %}
+                <h2>Algoritmo de Prim (Árvore Geradora Mínima)</h2>
+                <p class="success"><strong>{{ message | default('Sucesso!') }}</strong></p>
+                {% if status %}<p><strong>Status:</strong> {{ status }}</p>{% endif %}
+                
+                <h3>Arestas da MST:</h3>
+                {% if mst_edges %}
+                    <table class="results-table">
+                        <thead>
                             <tr>
-                                <td>{{ v }}</td>
-                                <td>{{ c }}</td>
+                                <th>De</th>
+                                <th>Para</th>
+                                <th>Custo (Peso)</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p>Nenhuma cor atribuída.</p>
-            {% endif %}
+                        </thead>
+                        <tbody>
+                            {% for u, v, weight in mst_edges %}
+                                <tr>
+                                    <td>{{ u }}</td>
+                                    <td>{{ v }}</td>
+                                    <td>{{ "%.2f"|format(weight) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Nenhuma aresta na MST (talvez um grafo de um único nó).</p>
+                {% endif %}
 
-            <hr>
+                <div class="total-cost">
+                    Custo Total da MST: {{ "%.2f"|format(total_cost) }}
+                </div>
 
-            <h2>Ordem de Coloração</h2>
-            {% if results.order %}
-                <pre>{{ results.order | join(' -> ') }}</pre>
-            {% else %}
-                <p><em>Ordem não disponível.</em></p>
-            {% endif %}
-
-            <hr>
-
-            <h2>Histórico de Saturação</h2>
-            {% if results.saturation_history %}
-                <table>
+            {% elif algorithm == 'Bellman-Ford' %}
+                <h2>Algoritmo de Bellman-Ford (Caminhos Mínimos)</h2>
+                <p class="success"><strong>{{ message }}</strong></p>
+                <p><strong>Origem:</strong> <code>{{ start_vertex }}</code></p>
+                
+                <h3>Resultados:</h3>
+                <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Vértice</th>
-                            <th>Saturação (evolução)</th>
+                            <th>Destino</th>
+                            <th>Custo Total</th>
+                            <th>Caminho Mínimo</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for v, history in results.saturation_history.items() | sort %}
+                        {% for vertex in results.distances.keys() | sort %}
                             <tr>
-                                <td>{{ v }}</td>
+                                <td><strong>{{ vertex }}</strong></td>
+                                <td>{{ results.distances[vertex] }}</td>
                                 <td>
-                                    {% if history %}
-                                        {{ history | join(', ') }}
+                                    {% set path = results.paths[vertex] %}
+                                    {% if path %}
+                                        {{ path | join(' &rarr; ') | safe }}
                                     {% else %}
-                                        <em>Sem alterações</em>
+                                        <em>Inacessível</em>
                                     {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-            {% else %}
-                <p><em>Nenhum histórico de saturação disponível.</em></p>
-            {% endif %}
+
+            {% elif algorithm == 'Floyd-Warshall' %}
+                <h2>Algoritmo de Floyd-Warshall (Caminhos Mínimos entre Todos os Pares)</h2>
+                <p class="success"><strong>{{ message | default('Processamento concluído com sucesso!') }}</strong></p>
+
+                {% if results and results.vertices %}
+                    <h3>Matriz de Distâncias:</h3>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>De \ Para</th>
+                                {% for v in results.vertices %}
+                                    <th>{{ v }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in results.vertices %}
+                                <tr>
+                                    <th>{{ i }}</th>
+                                    {% for j in results.vertices %}
+                                        {% set d = results.distances[i][j] if results.distances and i in results.distances and j in results.distances[i] else None %}
+                                        <td>
+                                            {% if d == 'Infinito' or d is none %}
+                                                ∞
+                                            {% else %}
+                                                {{ ('%.2f' % (d|float)) }}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <h3 style="margin-top:20px;">Caminhos Mínimos (origem → destino)</h3>
+                    <table class="results-table">
+                        <thead>
+                            <tr><th>Origem</th><th>Destino</th><th>Caminho</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for i in results.vertices %}
+                                {% for j in results.vertices %}
+                                    <tr>
+                                        <td>{{ i }}</td>
+                                        <td>{{ j }}</td>
+                                        <td>
+                                            {% set p = results.paths[i][j] if results.paths and i in results.paths and j in results.paths[i] else None %}
+                                            {% if p %}
+                                                {{ p | join(' &rarr; ') | safe }}
+                                            {% else %}
+                                                <em>Inacessível</em>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+                
+                {% else %}
+                    <p>Nenhum resultado disponível para Floyd-Warshall.</p>
+                {% endif %}
 
         {% endif %}
 
-        <hr>
-        <a href="/">Voltar</a>
+        <hr style="margin-top: 30px;">
+        <a href="/">Voltar para a seleção</a>
     </div>
-
 </body>
 </html>
